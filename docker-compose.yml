@@ -1,0 +1,42 @@
+version: '3'
+services:
+  auth:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./auth-service/.env
+    networks:
+      - app-network
+
+  todo:
+    build: ./todo-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./todo-service/.env
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - auth
+      - todo
+      - frontend
+    networks:
+      - app-network
+
+networks:
+  app-network:

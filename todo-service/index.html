@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Microservices Frontend</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <input id="email" placeholder="Email" />
+  <input id="password" placeholder="Password" type="password" />
+  <button onclick="login()">Login</button>
+
+  <h2>Todos</h2>
+  <button onclick="getTodos()">Load Todos</button>
+  <ul id="todo-list"></ul>
+
+  <script>
+    function login() {
+      fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        localStorage.setItem('token', data.token);
+        alert('Login successful!');
+      })
+      .catch(err => alert('Login failed'));
+    }
+
+    function getTodos() {
+      fetch('/todo/todos', {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('todo-list');
+        list.innerHTML = '';
+        data.forEach(todo => {
+          const li = document.createElement('li');
+          li.textContent = todo.title;
+          list.appendChild(li);
+        });
+      })
+      .catch(err => alert('Error loading todos'));
+    }
+  </script>
+</body>
+</html>

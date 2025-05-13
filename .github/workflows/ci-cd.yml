@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+
+      - name: Build and push auth-service
+        run: |
+          docker build -t $DOCKER_USER/auth-service ./auth-service
+          docker push $DOCKER_USER/auth-service
+
+      - name: Build and push todo-service
+        run: |
+          docker build -t $DOCKER_USER/todo-service ./todo-service
+          docker push $DOCKER_USER/todo-service
+
+      - name: Build and push frontend
+        run: |
+          docker build -t $DOCKER_USER/frontend ./frontend
+          docker push $DOCKER_USER/frontend

@@ -1,0 +1,8 @@
+# Stage 1: Use nginx to serve static files
+FROM nginx:alpine
+
+# Copy your HTML and JS files into nginx's public folder
+COPY . /usr/share/nginx/html
+
+# Expose port (not mandatory, but helpful for documentation)
+EXPOSE 80
